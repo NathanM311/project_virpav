@@ -13,7 +13,7 @@ mkdir -p $OUT_DIR
 # ==================================================================
 # ⚠️ ATTENTION : VÉRIFIE CES DEUX LIGNES POUR TES READS NETTOYÉS ⚠️
 # Adapte le dossier et le nom exact de tes R1/R2 (ex: fp1, fp2, clean_R1...)
-READS_DIR="${BASE_DIR}/02_results/02_phix_removed" 
+READS_DIR="${BASE_DIR}/02_results/02_phix_removed/${SAMPLE}"
 R1="${READS_DIR}/${SAMPLE}_no_phix_R1.fastq.gz"
 R2="${READS_DIR}/${SAMPLE}_no_phix_R2.fastq.gz"
 # ==================================================================
