@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 # ------------------------------------------------------------------
 # SCRIPT 14 : MAPPING BWA-MEM DES READS SUR LA GIANT VIRUS DATABASE
 # Utilisation : ./00_scripts/14_mapping_gvdb.sh <ECHANTILLON>

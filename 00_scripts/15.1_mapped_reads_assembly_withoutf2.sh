@@ -17,7 +17,7 @@ echo "🦠 Échantillon : $SAMPLE"
 echo "===================================================================="
 
 # Dossiers
-MAP_DIR="$BASE_DIR/02_results/14_mapping_gvdb_withoutf2/$SAMPLE"
+MAP_DIR="$BASE_DIR/02_results/14.1_mapping_gvdb_withoutf2/$SAMPLE"
 OUT_DIR="$BASE_DIR/02_results/15.1_targeted_assembly_withoutf2/$SAMPLE"
 mkdir -p $OUT_DIR
 
