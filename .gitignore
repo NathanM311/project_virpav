@@ -1,0 +1,27 @@
+# On ignore les dossiers lourds
+01_data/
+02_results/
+03_logs/
+databases/
+
+# On ignore les formats de fichiers bioinfo
+*.fastq
+*.fastq.gz
+*.fasta
+*.fa
+*.faa
+*.pep
+*.bam
+*.sam
+*.bai
+*.dmnd
+*.hmm
+*.tsv
+*.csv
+*.log
+
+# On ignore les fichiers systèmes et conda
+.conda/
+.cache/
+__pycache__/
+.DS_Store
