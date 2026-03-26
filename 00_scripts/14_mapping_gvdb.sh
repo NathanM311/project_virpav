@@ -27,6 +27,12 @@ echo "===================================================================="
 echo "🎯 SCRIPT 14 : MAPPING BWA-MEM SUR GVDB POUR $SAMPLE"
 echo "===================================================================="
 
+# === NOUVEAU : ACTIVATION DE L'ENVIRONNEMENT ===
+echo "🔄 Chargement de l'environnement conda env_mapping..."
+source $HOME/miniconda3/etc/profile.d/conda.sh
+conda activate env_mapping
+# ===============================================
+
 # 1. PRÉPARATION DE L'INDEX BWA (Se fait une seule fois)
 if [ ! -f "${REF_FASTA}.bwt" ]; then
     echo "⚙️ 1/4 : Création du Méga-Génome (Fusion des 1382 virus)..."
@@ -66,6 +72,13 @@ samtools idxstats $BAM_Q10 | awk '$3 > 0 {print $0}' | sort -k3,3nr > $TSV_OUT
 
 # Nettoyage des gros fichiers temporaires
 rm $SAM_OUT $BAM_RAW
+
+# === NOUVEAU : DÉSACTIVATION ===
+conda deactivate
+# ===============================
+
+echo "===================================================================="
+echo "✅ MAPPING TERMINÉ !"
 
 echo "===================================================================="
 echo "✅ MAPPING TERMINÉ !"

@@ -26,6 +26,15 @@ BAM_INPUT="$MAP_DIR/${SAMPLE}_GVDB_Q10_sorted.bam"
 R1_VIRUS="$OUT_DIR/${SAMPLE}_virus_R1.fastq.gz"
 R2_VIRUS="$OUT_DIR/${SAMPLE}_virus_R2.fastq.gz"
 
+# === NOUVEAU : ACTIVATION POUR SAMTOOLS ===
+echo "🔄 Chargement de l'environnement conda env_mapping (pour samtools)..."
+source $HOME/miniconda3/etc/profile.d/conda.sh
+conda activate env_mapping
+# ==========================================
+
+# ------------------------------------------------------------------
+# ÉTAPE 1 : EXTRACTION DES READS MAPPÉS
+
 # ------------------------------------------------------------------
 # ÉTAPE 1 : EXTRACTION DES READS MAPPÉS
 # ------------------------------------------------------------------
@@ -40,6 +49,15 @@ samtools fastq -@ $THREADS $OUT_DIR/tmp_mapped_sorted.bam \
     -0 /dev/null -s /dev/null -n
 
 rm $OUT_DIR/tmp_mapped_sorted.bam
+
+rm $OUT_DIR/tmp_mapped_sorted.bam
+
+# === NOUVEAU : DÉSACTIVATION ===
+conda deactivate
+# ===============================
+
+# ------------------------------------------------------------------
+# ÉTAPE 2 : ASSEMBLAGE AVEC SPADES (Mode --careful)
 
 # ------------------------------------------------------------------
 # ÉTAPE 2 : ASSEMBLAGE AVEC SPADES (Mode --careful)
