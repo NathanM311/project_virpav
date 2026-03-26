@@ -35,43 +35,67 @@
 │   ├── 02_phix_removed
 │   │   └── MOCK_SAMPLE
 │   ├── 03_sortmerna
-│   │   └── 10-21D-AC16
-│   │       └── workdir_10-21D-AC16
+│   │   ├── 10-21D-AC16
+│   │   └── MOCK_SAMPLE
+│   │       └── workdir_MOCK_SAMPLE
 │   ├── 04_assembly
-│   │   └── 10-21D-AC16
+│   │   ├── 10-21D-AC16
+│   │   │   ├── noribosome_rnabloom
+│   │   │   └── noribosome_rnaspades
+│   │   └── MOCK_SAMPLE
 │   │       ├── noribosome_rnabloom
 │   │       └── noribosome_rnaspades
 │   ├── 05_taxonomy
 │   │   └── 10-21D-AC16
 │   ├── 06_clustering
-│   │   └── 10-21D-AC16
+│   │   ├── 10-21D-AC16
+│   │   └── MOCK_SAMPLE
 │   ├── 07_virsorter2
-│   │   └── 10-21D-AC16
+│   │   ├── 10-21D-AC16
+│   │   │   ├── iter-0
+│   │   │   └── log
+│   │   └── MOCK_SAMPLE
 │   │       ├── iter-0
 │   │       └── log
 │   ├── 08_annotation_virsorter2
-│   │   └── 10-21D-AC16
+│   │   ├── 10-21D-AC16
+│   │   └── MOCK_SAMPLE
 │   ├── 09_annotation_hmm
-│   │   └── 10-21D-AC16
+│   │   ├── 10-21D-AC16
+│   │   │   ├── transcripts.fasta.transdecoder_dir
+│   │   │   ├── transcripts.fasta.transdecoder_dir.__checkpoints
+│   │   │   └── transcripts.fasta.transdecoder_dir.__checkpoints_longorfs
+│   │   └── MOCK_SAMPLE
 │   │       ├── transcripts.fasta.transdecoder_dir
 │   │       ├── transcripts.fasta.transdecoder_dir.__checkpoints
 │   │       └── transcripts.fasta.transdecoder_dir.__checkpoints_longorfs
 │   ├── 10_checkv
-│   │   └── 10-21D-AC16
+│   │   ├── 10-21D-AC16
+│   │   │   └── checkv_results
+│   │   └── MOCK_SAMPLE
 │   │       └── checkv_results
 │   ├── 11_final_integration
-│   │   └── 10-21D-AC16
+│   │   ├── 10-21D-AC16
+│   │   └── MOCK_SAMPLE
 │   ├── 12_verification_hmm
-│   │   └── 10-21D-AC16
+│   │   ├── 10-21D-AC16
+│   │   └── MOCK_SAMPLE
 │   ├── 13_phylogeny
-│   │   └── 10-21D-AC16
+│   │   ├── 10-21D-AC16
+│   │   └── MOCK_SAMPLE
+│   ├── 14.1_mapping_gvdb_withoutf2
+│   │   └── MOCK_SAMPLE
 │   ├── 14_mapping_gvdb
-│   │   └── 10-21D-AC16
+│   │   ├── 10-21D-AC16
+│   │   └── MOCK_SAMPLE
 │   └── 15_targeted_assembly
-│       └── 10-21D-AC16
+│       ├── 10-21D-AC16
+│       │   └── spades_assembly
+│       └── MOCK_SAMPLE
 │           └── spades_assembly
 ├── 03_logs
+│   └── run_nuit_MOCK_SAMPLE
 ├── 04_figures
 └── 05_docs
 
-75 directories
+99 directories
