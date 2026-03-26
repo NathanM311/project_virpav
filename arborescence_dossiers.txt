@@ -1,0 +1,77 @@
+.
+├── 00_scripts
+├── 01_data
+│   ├── databases
+│   │   ├── checkv_db
+│   │   │   └── checkv-db-v1.5
+│   │   └── phix
+│   ├── GVDB_genomes
+│   │   ├── GVDB_nucl
+│   │   └── GVDB_prot
+│   ├── hmm
+│   │   └── GVOGs
+│   ├── phix
+│   ├── raw_data
+│   │   └── MOCK_SAMPLE
+│   ├── ribosomes
+│   │   ├── PR2
+│   │   └── Silva
+│   ├── sortmerna
+│   └── virsorter2_db
+│       ├── conda_envs
+│       │   └── c7e5e984
+│       ├── group
+│       │   ├── dsDNAphage
+│       │   ├── lavidaviridae
+│       │   ├── NCLDV
+│       │   ├── RNA
+│       │   └── ssDNA
+│       ├── hmm
+│       │   ├── pfam
+│       │   └── viral
+│       └── rbs
+├── 02_results
+│   ├── 01_trimmed
+│   ├── 02_phix_removed
+│   │   └── MOCK_SAMPLE
+│   ├── 03_sortmerna
+│   │   └── 10-21D-AC16
+│   │       └── workdir_10-21D-AC16
+│   ├── 04_assembly
+│   │   └── 10-21D-AC16
+│   │       ├── noribosome_rnabloom
+│   │       └── noribosome_rnaspades
+│   ├── 05_taxonomy
+│   │   └── 10-21D-AC16
+│   ├── 06_clustering
+│   │   └── 10-21D-AC16
+│   ├── 07_virsorter2
+│   │   └── 10-21D-AC16
+│   │       ├── iter-0
+│   │       └── log
+│   ├── 08_annotation_virsorter2
+│   │   └── 10-21D-AC16
+│   ├── 09_annotation_hmm
+│   │   └── 10-21D-AC16
+│   │       ├── transcripts.fasta.transdecoder_dir
+│   │       ├── transcripts.fasta.transdecoder_dir.__checkpoints
+│   │       └── transcripts.fasta.transdecoder_dir.__checkpoints_longorfs
+│   ├── 10_checkv
+│   │   └── 10-21D-AC16
+│   │       └── checkv_results
+│   ├── 11_final_integration
+│   │   └── 10-21D-AC16
+│   ├── 12_verification_hmm
+│   │   └── 10-21D-AC16
+│   ├── 13_phylogeny
+│   │   └── 10-21D-AC16
+│   ├── 14_mapping_gvdb
+│   │   └── 10-21D-AC16
+│   └── 15_targeted_assembly
+│       └── 10-21D-AC16
+│           └── spades_assembly
+├── 03_logs
+├── 04_figures
+└── 05_docs
+
+75 directories
