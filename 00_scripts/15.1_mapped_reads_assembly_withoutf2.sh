@@ -34,9 +34,6 @@ conda activate env_mapping
 
 # ------------------------------------------------------------------
 # ÉTAPE 1 : EXTRACTION DES READS MAPPÉS
-
-# ------------------------------------------------------------------
-# ÉTAPE 1 : EXTRACTION DES READS MAPPÉS
 # ------------------------------------------------------------------
 echo "📦 [1/3] Extraction des reads qui ont mappé sur GVDB..."
 
@@ -52,12 +49,8 @@ rm $OUT_DIR/tmp_mapped_sorted.bam
 
 rm $OUT_DIR/tmp_mapped_sorted.bam
 
-# === NOUVEAU : DÉSACTIVATION ===
-conda deactivate
-# ===============================
 
-# ------------------------------------------------------------------
-# ÉTAPE 2 : ASSEMBLAGE AVEC SPADES (Mode --careful)
+conda deactivate
 
 # ------------------------------------------------------------------
 # ÉTAPE 2 : ASSEMBLAGE AVEC SPADES (Mode --careful)
