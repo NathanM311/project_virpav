@@ -2,6 +2,7 @@
 01_data/
 02_results/
 03_logs/
+05_docs/
 databases/
 
 # On ignore les formats de fichiers bioinfo
