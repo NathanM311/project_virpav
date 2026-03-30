@@ -17,7 +17,7 @@ for FILE in ${TRIMMED_DIR}/*_R1_001_val_1.fq.gz; do
     # On coupe tout ce qui se trouve après le "_S" pour n'avoir que le nom pur (ex: 10-21D-AC16)
     SAMPLE=${FILENAME%%_S*}
     
-    if [ "$SAMPLE" == "MOCK_SAMPLE" ]; then continue; fi
+   # if [ "$SAMPLE" == "MOCK_SAMPLE" ]; then continue; fi
     
     echo "----------------------------------------------------------"
     echo "🦠 ÉCHANTILLON : $SAMPLE [Début : $(date +%H:%M)]"

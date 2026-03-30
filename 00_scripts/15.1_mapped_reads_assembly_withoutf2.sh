@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 # ------------------------------------------------------------------
 # SCRIPT 15 : ASSEMBLAGE CIBLÉ (TARGETED ASSEMBLY) DES READS VIRAUX
 # BUT : Reconstruire le protogénome à partir des reads mappés sur GVDB

@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 # ------------------------------------------------------------------
 # SCRIPT 01 : SUPPRESSION DU PHAGE PhiX174 AVEC BOWTIE2
 # Échantillon : AC16

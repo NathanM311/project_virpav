@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 # ------------------------------------------------------------------
 # SCRIPT 11 : INTÉGRATION FINALE (CheckV + DIAMOND)
 # Objectif    : Croiser les contigs ultra-purs avec leur annotation

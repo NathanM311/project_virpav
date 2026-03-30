@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 # ------------------------------------------------------------------
 # SCRIPT 10 : VALIDATION DES VIRUS AVEC CHECKV (Gold Standard)
 # Utilisation : ./00_scripts/10_checkv_validation.sh <NOM_ECHANTILLON>

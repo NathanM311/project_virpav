@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 # ------------------------------------------------------------------
 # SCRIPT 13 : EXTRACTION DES SÉQUENCES POUR LA PHYLOGÉNIE (CORRIGÉ)
 # Utilisation : ./00_scripts/13_extract_phylogeny.sh <ECHANTILLON> "<MOT_CLE>"
