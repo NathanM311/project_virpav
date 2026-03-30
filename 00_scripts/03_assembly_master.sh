@@ -79,11 +79,11 @@ conda deactivate
 # PARTIE 2 : RIBOSOME 
 # ------------------------------------------------------------------
 
-#echo "🌿 [4/4] Trinity via rnaseq (Ribosome)..."
-#conda run -n rnaseq Trinity --seqType fq --left $R1_RIBO_FQ --right $R2_RIBO_FQ \
-#        --CPU $THREADS --max_memory $MEM \
-#        --output $OUT_DIR/ribosome_trinity \
-#        --full_cleanup --min_contig_length 200
+echo "🌿 [4/4] Trinity via rnaseq (Ribosome)..."
+conda run -n rnaseq Trinity --seqType fq --left $R1_RIBO_FQ --right $R2_RIBO_FQ \
+        --CPU $THREADS --max_memory $MEM \
+        --output $OUT_DIR/ribosome_trinity \
+        --full_cleanup --min_contig_length 200
 
 # ------------------------------------------------------------------
 # NETTOYAGE

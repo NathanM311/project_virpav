@@ -5,7 +5,7 @@
 
 START_TIME=$(date +%s)
 BASE_DIR="/mnt/MERSEA/morandi241/project_virpav/ANALYSIS_V3_PROPRE"
-SAMPLE="10-21D-AC16"
+SAMPLE=${1:-"MOCK_SAMPLE"}
 
 # Chemins
 QUERY_FASTA="${BASE_DIR}/02_results/04_assembly/${SAMPLE}/ribosome_trinity.Trinity.fasta"
