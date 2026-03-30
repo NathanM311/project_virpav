@@ -6,7 +6,7 @@ set -e
 # Exemple     : ./00_scripts/13_extract_phylogeny.sh 10-21D-AC16 "capsid"
 # ------------------------------------------------------------------
 
-SAMPLE=${1:-"10-21D-AC16"}
+SAMPLE=${1:-"MOCK_SAMPLE"}
 KEYWORD=${2:-"capsid"}
 
 BASE_DIR="/mnt/MERSEA/morandi241/project_virpav/ANALYSIS_V3_PROPRE"

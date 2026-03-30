@@ -5,7 +5,7 @@ set -e
 # Utilisation : ./00_scripts/14_mapping_gvdb.sh <ECHANTILLON>
 # ------------------------------------------------------------------
 
-SAMPLE=${1:-"10-21D-AC16"}
+SAMPLE=${1:-"MOCK_SAMPLE"}
 
 BASE_DIR="/mnt/MERSEA/morandi241/project_virpav/ANALYSIS_V3_PROPRE"
 OUT_DIR="${BASE_DIR}/02_results/14.1_mapping_gvdb_withoutf2/${SAMPLE}"

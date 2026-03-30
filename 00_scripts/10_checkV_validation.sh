@@ -7,7 +7,7 @@ set -e
 # ------------------------------------------------------------------
 
 # 1. Gestion de l'échantillon (prend l'argument 1, ou 10-21D-AC16 par défaut)
-SAMPLE=${1:-"10-21D-AC16"}
+SAMPLE=${1:-"MOCK_SAMPLE"}
 
 echo "===================================================================="
 echo "🚀 DÉMARRAGE DE CHECKV POUR L'ÉCHANTILLON : $SAMPLE"

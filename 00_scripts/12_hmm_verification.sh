@@ -4,7 +4,7 @@ set -e
 # SCRIPT 12 : VÉRIFICATION HMM (TOUS LES HITS + MEILLEURS TRADUITS)
 # ------------------------------------------------------------------
 
-SAMPLE=${1:-"10-21D-AC16"}
+SAMPLE=${1:-"MOCK_SAMPLE"}
 
 BASE_DIR="/mnt/MERSEA/morandi241/project_virpav/ANALYSIS_V3_PROPRE"
 HMM_DIR="${BASE_DIR}/02_results/09_annotation_hmm/${SAMPLE}"

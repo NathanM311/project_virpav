@@ -6,7 +6,7 @@ set -e
 # Utilisation : ./00_scripts/11_final_viral_integration.sh <NOM_ECHANTILLON>
 # ------------------------------------------------------------------
 
-SAMPLE=${1:-"10-21D-AC16"}
+SAMPLE=${1:-"MOCK_SAMPLE"}
 
 echo "===================================================================="
 echo "🧬 CROISEMENT FINAL POUR L'ÉCHANTILLON : $SAMPLE"
