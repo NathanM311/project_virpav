@@ -13,7 +13,14 @@ IN_FASTA="${BASE_DIR}/02_results/06_clustering/${SAMPLE}/mmseqs_out_rep_seq.fast
 OUT_DIR="${BASE_DIR}/02_results/07_virsorter2/${SAMPLE}"
 DB_DIR="${BASE_DIR}/01_data/virsorter2_db"
 
-mkdir -p $OUT_DIR
+# Si le dossier existe déjà (ex: run précédent), on le vide pour éviter le crash de VirSorter2
+if [ -d "$OUT_DIR" ]; then
+    echo "⚠️ Nettoyage du dossier VirSorter2 existant pour $SAMPLE..."
+    rm -rf "${OUT_DIR:?}"/*
+    rm -rf "${OUT_DIR}"/.snakemake 2>/dev/null
+else
+    mkdir -p "$OUT_DIR"
+fi
 
 echo "🔄 Chargement de env_virsorter2..."
 source $HOME/miniconda3/etc/profile.d/conda.sh
