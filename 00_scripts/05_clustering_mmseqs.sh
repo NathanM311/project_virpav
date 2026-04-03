@@ -16,7 +16,6 @@ mkdir -p $OUT_DIR
 
 # Fichiers d'entrée
 SPADES="$IN_DIR/noribosome_rnaspades/transcripts.fasta"
-# 2. Correction : Remplacement du point par un slash pour Trinity
 TRINITY="$IN_DIR/noribosome_trinity.Trinity.fasta" 
 BLOOM="$IN_DIR/noribosome_rnabloom/rnabloom.transcripts.fa"
 COMBINED="$OUT_DIR/${SAMPLE}_combined_assembly.fasta"
