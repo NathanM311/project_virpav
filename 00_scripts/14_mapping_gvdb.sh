@@ -56,9 +56,12 @@ echo "🚀 2/4 : Mapping BWA-MEM et conversion BAM à la volée (Sur disque loca
 # Le pipe '|' évite d'écrire le SAM sur le disque
 bwa mem -t 14 $REF_FASTA $R1 $R2 | samtools view -@ 14 -bS - > $LOCAL_TMP/raw.bam
 
+# Sauvegarde du BAM brut pour réutilisation potentielle
+mv $LOCAL_TMP/raw.bam $OUT_DIR/
+
 # 3. TRI ET FILTRAGE Q10 (En local)
-echo "📦 3/4 : Filtrage strict (MAPQ >= 10)..."
-samtools view -@ 14 -b -q 10 -f 2 $LOCAL_TMP/raw.bam | samtools sort -@ 14 -o $LOCAL_TMP/${SAMPLE}_GVDB_Q10_sorted.bam
+echo "📦 3/4 : Filtrage strict (MAPQ >= 10, paired-end)..."
+samtools view -@ 14 -b -q 10 -f 2 $OUT_DIR/raw.bam | samtools sort -@ 14 -o $LOCAL_TMP/${SAMPLE}_GVDB_Q10_sorted.bam
 samtools index $LOCAL_TMP/${SAMPLE}_GVDB_Q10_sorted.bam
 
 # 4. STATISTIQUES ET RAPATRIEMENT

@@ -47,21 +47,27 @@ else
 fi
 
 # Fichiers de sortie
-SAM_OUT="${OUT_DIR}/${SAMPLE}_GVDB.sam"
-BAM_RAW="${OUT_DIR}/${SAMPLE}_GVDB_raw.bam"
 BAM_Q10="${OUT_DIR}/${SAMPLE}_GVDB_Q10_sorted.bam"
 
-# 2. MAPPING BWA-MEM
-echo "🚀 2/4 : Mapping BWA-MEM des reads (Le chalut est lancé)..."
-bwa mem -t 14 $REF_FASTA $R1 $R2 > $SAM_OUT
+# Vérification si le BAM brut existe déjà (de script 14)
+RAW_BAM_14="${BASE_DIR}/02_results/14_mapping_gvdb/${SAMPLE}/raw.bam"
+if [ -f "$RAW_BAM_14" ]; then
+    echo "🔄 Réutilisation du BAM brut de script 14 (mapping déjà fait)"
+    BAM_RAW="$RAW_BAM_14"
+    SKIP_MAPPING=true
+else
+    echo "🚀 2/4 : Mapping BWA-MEM des reads (Le chalut est lancé)..."
+    SAM_OUT="${OUT_DIR}/${SAMPLE}_GVDB.sam"
+    BAM_RAW="${OUT_DIR}/${SAMPLE}_GVDB_raw.bam"
+    bwa mem -t 14 $REF_FASTA $R1 $R2 > $SAM_OUT
+    samtools view -@ 14 -bS $SAM_OUT > $BAM_RAW
+    rm $SAM_OUT
+    SKIP_MAPPING=false
+fi
 
-# 3. CONVERSION, TRI ET FILTRAGE Q10
-echo "📦 3/4 : Conversion SAM -> BAM et Filtrage stricte (MAPQ >= 10)..."
-# On convertit en BAM pour gagner de la place
-samtools view -@ 14 -bS $SAM_OUT > $BAM_RAW
-# On filtre Q10 (-q 10) et on trie par coordonnées (sort)
+# 3. TRI ET FILTRAGE Q10 (sans -f 2)
+echo "📦 3/4 : Filtrage Q10 (MAPQ >= 10, sans contrainte paired-end)..."
 samtools view -@ 14 -b -q 10 $BAM_RAW | samtools sort -@ 14 -o $BAM_Q10
-# On indexe le BAM final pour les logiciels de visualisation (comme IGV)
 samtools index $BAM_Q10
 
 # 4. STATISTIQUES ET COMPTAGE
@@ -72,7 +78,9 @@ TSV_OUT="${OUT_DIR}/${SAMPLE}_viral_abundance.tsv"
 samtools idxstats $BAM_Q10 | awk '$3 > 0 {print $0}' | sort -k3,3nr > $TSV_OUT
 
 # Nettoyage des gros fichiers temporaires
-rm $SAM_OUT $BAM_RAW
+if [ "$SKIP_MAPPING" = false ]; then
+    rm $BAM_RAW
+fi
 
 # === NOUVEAU : DÉSACTIVATION ===
 conda deactivate
