@@ -29,18 +29,21 @@ ln -sf $IN_FASTA transcripts.fasta
 echo "===================================================================="
 echo "🧬 1/5 : VOIE PRINCIPALE (TransDecoder + Pfam)"
 echo "===================================================================="
+
+# 💡 CORRECTION 1 : Nettoyage des anciens runs pour forcer TransDecoder à tout refaire
+rm -rf transcripts.fasta.transdecoder_dir* transcripts.fasta.transdecoder.* pfam.domtblout PROTEINS_TD.pep
+
 TransDecoder.LongOrfs -t transcripts.fasta
 
-# On retire le > /dev/null pour que tu voies l'erreur si Pfam n'est pas trouvé
 hmmsearch --cpu 14 -E 1e-5 --domtblout pfam.domtblout \
           ${DB_DIR}/Pfam-A.hmm transcripts.fasta.transdecoder_dir/longest_orfs.pep
 
-# SÉCURITÉ : On ne force Pfam que s'il a bien généré un fichier
-if [ -s pfam.domtblout ]; then
+# 💡 CORRECTION 2 : Vérifier les vrais hits (ignorer les lignes de commentaires commençant par #)
+if [ $(grep -v "^#" pfam.domtblout | wc -l) -gt 0 ]; then
     echo "✅ Pfam détecté, utilisation pour la prédiction finale..."
     TransDecoder.Predict -t transcripts.fasta --retain_pfam_hits pfam.domtblout
 else
-    echo "⚠️ Attention: pfam.domtblout introuvable ou vide. Prédiction sans Pfam."
+    echo "⚠️ Attention: Aucun hit Pfam significatif. Prédiction sans Pfam."
     TransDecoder.Predict -t transcripts.fasta
 fi
 
