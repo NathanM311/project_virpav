@@ -32,10 +32,6 @@ echo "🔄 Chargement de l'environnement conda env_mapping (pour samtools)..."
 source $HOME/miniconda3/etc/profile.d/conda.sh
 conda activate env_mapping
 # ==========================================
-
-# ------------------------------------------------------------------
-# ÉTAPE 1 : EXTRACTION DES READS MAPPÉS
-
 # ------------------------------------------------------------------
 # ÉTAPE 1 : EXTRACTION DES READS MAPPÉS
 # ------------------------------------------------------------------
@@ -51,14 +47,10 @@ samtools fastq -@ $THREADS $OUT_DIR/tmp_mapped_sorted.bam \
 
 rm $OUT_DIR/tmp_mapped_sorted.bam
 
-rm $OUT_DIR/tmp_mapped_sorted.bam
 
 # === NOUVEAU : DÉSACTIVATION ===
 conda deactivate
 # ===============================
-
-# ------------------------------------------------------------------
-# ÉTAPE 2 : ASSEMBLAGE AVEC SPADES (Mode --careful)
 
 # ------------------------------------------------------------------
 # ÉTAPE 2 : ASSEMBLAGE AVEC SPADES (Mode --careful)

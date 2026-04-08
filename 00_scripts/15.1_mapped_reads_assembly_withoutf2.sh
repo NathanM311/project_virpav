@@ -48,8 +48,6 @@ samtools fastq -@ $THREADS $OUT_DIR/tmp_mapped_sorted.bam \
 
 rm $OUT_DIR/tmp_mapped_sorted.bam
 
-rm $OUT_DIR/tmp_mapped_sorted.bam
-
 
 conda deactivate
 

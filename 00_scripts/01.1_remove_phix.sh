@@ -4,9 +4,6 @@ set -e
 # SCRIPT 01 : SUPPRESSION DU PHAGE PhiX174 AVEC BOWTIE2 (VERSION TURBO)
 # ------------------------------------------------------------------
 
-# Arrête le script immédiatement s'il y a une erreur
-set -e
-
 SAMPLE=${1:-"MOCK_SAMPLE"}
 BASE_DIR="/mnt/MERSEA/morandi241/project_virpav/ANALYSIS_V3_PROPRE"
 
@@ -44,6 +41,10 @@ echo "🦠 Nettoyage du PhiX pour l'échantillon : $SAMPLE"
 
 # 3. Lancement de Bowtie2 (Écriture des fastq.gz sur le /tmp)
 # -S /dev/null jette l'alignement pour ne pas saturer le disque
+# Activation de l'environement qui contient Bowtie2
+source $HOME/miniconda3/etc/profile.d/conda.sh
+conda activate rnaseq
+
 bowtie2 -x ${DB_DIR}/phix \
         -1 $R1 -2 $R2 \
         --threads 14 \
