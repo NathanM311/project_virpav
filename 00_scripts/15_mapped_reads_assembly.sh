@@ -69,7 +69,7 @@ conda run -n env_spades spades.py \
     -1 $R1_VIRUS -2 $R2_VIRUS \
     -o $OUT_DIR/spades_assembly \
     -t $THREADS -m $MEM_SPADES \
-    --careful
+    
 
 # ------------------------------------------------------------------
 # ÉTAPE 3 : ANALYSE DES RÉSULTATS
