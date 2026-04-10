@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 # ------------------------------------------------------------------
-# SCRIPT 16 (V3 - LONG) : RAPPORT D'ANALYSE COMPLET
+# SCRIPT 16 (V3 - LONG) : RAPPORT D'ANALYSE COMPLET (OBSIDIAN READY)
 # ------------------------------------------------------------------
 
 SAMPLE=${1:-"MOCK_SAMPLE"}
@@ -73,26 +73,18 @@ if [ -f "$PR2_FILE" ]; then
     fi
 fi
 
-# B. CARTE DE REPRÉSENTATION
+# B. CARTE DE REPRÉSENTATION (Mise à jour avec le fichier unifié !)
 COMMUNITY_MAP=""
-if [ -f "$PR2_FILE" ] && [ -f "$SILVA_FILE" ]; then
-    EUK_MAP=$(awk -F'\t' 'NR>1 {
-        id=$15; gsub(/,/, ".", id);
-        if ($16 >= 500 && id >= 95) print $13
-    }' "$PR2_FILE" | sort | uniq -c | sort -nr | head -n 3 | awk '{print "  * 🌿 Eucaryote : **" $2 "** (" $1 " contigs)"}')
-    
-    PROK_MAP=$(awk -F'\t' 'NR>1 {
-        id=$3; gsub(/,/, ".", id);
-        if ($4 >= 500 && id >= 95 && ($7 ~ /^Bacteria/ || $7 ~ /^Archaea/)) {
-            n=split($7, tax, ";"); genre=tax[n]; if(genre=="" || genre==" ") genre=tax[n-1];
-            print genre
-        }
-    }' "$SILVA_FILE" | sort | uniq -c | sort -nr | head -n 3 | awk '{print "  * 🦠 Bactérie : **" $2 "** (" $1 " contigs)"}')
-    
-    [ -n "$EUK_MAP" ] && COMMUNITY_MAP="${EUK_MAP}\n"
-    [ -n "$PROK_MAP" ] && COMMUNITY_MAP="${COMMUNITY_MAP}${PROK_MAP}"
+UNIFIED_FILE="${BASE_DIR}/02_results/Analyse/${SAMPLE}/${SAMPLE}_unified_microbiome_detailed.tsv"
+
+if [ -f "$UNIFIED_FILE" ]; then
+    # J'ai laissé ton head -n 100 si tu veux une longue liste !
+    COMMUNITY_MAP=$(awk -F'\t' '
+        NR>1 {count[$4" - "$5]++} 
+        END {for (tax in count) print count[tax]"\t"tax}
+    ' "$UNIFIED_FILE" | sort -nr | head -n 100 | awk -F'\t' '{print "| **" $1 "** | " $2 " |"}')
 else
-    COMMUNITY_MAP="*Fichiers taxonomiques introuvables.*"
+    COMMUNITY_MAP="| *Fichier unifié introuvable* | *Lancez le script Analyse 01* |"
 fi
 
 # --- 4. ANALYSE DES CONTIGS GLOBAUX & VIRUS ---
@@ -136,7 +128,8 @@ fi
 # --- 5. ABONDANCE GVDB ---
 FILE_ABUNDANCE="${BASE_DIR}/02_results/14_mapping_gvdb/${SAMPLE}/${SAMPLE}_viral_abundance.tsv"
 if [ -f "$FILE_ABUNDANCE" ]; then
-    TOP_VIRUS_MD=$(head -n 6 "$FILE_ABUNDANCE" | awk 'BEGIN {print "| Génome | Taille | Reads Mappés |\n|---|---|---|"} {print "| "$1" | "$2" | "$3" |"}')
+    # On ajoute des sauts de ligne autour du header pour Markdown
+    TOP_VIRUS_MD=$(head -n 6 "$FILE_ABUNDANCE" | awk 'BEGIN {print "| Génome | Taille | Reads Mappés |\n| :--- | :---: | :---: |"} {print "| "$1" | "$2" | "$3" |"}')
 else
     TOP_VIRUS_MD="*Fichier d'abondance introuvable.*"
 fi
@@ -147,6 +140,8 @@ REPORT_FILE="${DOC_DIR}/${SAMPLE}_complete_report.md"
 cat << EOF > "$REPORT_FILE"
 # 🦠 Rapport d'Analyse Virpav - Échantillon : ${SAMPLE}
 *Date de génération : $(date "+%Y-%m-%d %H:%M")*
+
+---
 
 ## 1. Statistiques des Séquences (Nettoyage)
 * **Nombre total de reads bruts (R1+R2)** : **${TOTAL_READS}**
@@ -159,7 +154,10 @@ cat << EOF > "$REPORT_FILE"
 **A. Espèce Hôte Dominante (Top Hit 18S)**
 * ${MAIN_HOST}
 
-**B. Carte de la Communauté (Filtre > 500pb, > 95%)**
+**B. Top de la Communauté Globale (PR2 + SILVA SSU/LSU)**
+
+| Nombre de Contigs | Domaine - Phylum |
+| :---: | :--- |
 ${COMMUNITY_MAP}
 
 ## 3. Analyse des Contigs et Virus
@@ -169,11 +167,13 @@ ${COMMUNITY_MAP}
 * **Assemblage Ciblé (SPAdes)** : ${NB_TARGET} scaffolds viraux reconstruits.
 
 ## 4. Fonctions Biologiques Dominantes (HMM)
+
 | Occurrences | Fonction Biologique |
-|---|---|
+| :---: | :--- |
 ${TOP_FUNCTIONS}
 
 ## 5. Abondance GVDB (Recrutement de reads)
+
 ${TOP_VIRUS_MD}
 
 ---
