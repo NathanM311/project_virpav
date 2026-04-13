@@ -2,16 +2,16 @@
 set -e
 
 # ------------------------------------------------------------------
-# SCRIPT Analyse 02 : KRONA PLOT DOUBLE (CONTIGS vs TPM)
+# SCRIPT Analyse 02 : KRONA PLOT DOUBLE (CONTIGS vs TPM KALLISTO)
 # ------------------------------------------------------------------
 
 SAMPLE=${1:-"10-21D-AC16"}
 BASE_DIR="/mnt/MERSEA/morandi241/project_virpav/ANALYSIS_V3_PROPRE"
 
-# Chemins des fichiers
+# Chemins des fichiers (MISE À JOUR DU CHEMIN TPM VERS KALLISTO)
 ANALYSE_DIR="${BASE_DIR}/02_results/Analyse/${SAMPLE}"
 UNIFIED_FILE="${ANALYSE_DIR}/${SAMPLE}_unified_microbiome_detailed.tsv"
-TPM_FILE="${BASE_DIR}/02_results/16_quantification_salmon_all/${SAMPLE}/${SAMPLE}_abundance_ribo_TPM.tsv"
+TPM_FILE="${BASE_DIR}/02_results/16_quantification_kallisto_all/${SAMPLE}/${SAMPLE}_abundance_ribo_TPM.tsv"
 
 # Fichiers temporaires pour Krona
 KRONA_IN_CONTIGS="${ANALYSE_DIR}/krona_in_contigs.txt"
@@ -24,7 +24,7 @@ echo "===================================================================="
 
 # Vérifications
 if [ ! -f "$UNIFIED_FILE" ]; then echo "❌ Fichier taxonomie absent."; exit 1; fi
-if [ ! -f "$TPM_FILE" ]; then echo "❌ Fichier TPM absent (lancez le script Salmon d'abord)."; exit 1; fi
+if [ ! -f "$TPM_FILE" ]; then echo "❌ Fichier TPM absent (lancez le script Kallisto d'abord)."; exit 1; fi
 
 # --- 1. Préparation du dataset : NOMBRE DE CONTIGS ---
 echo "📝 Préparation des données : Nombre de Contigs..."
