@@ -40,7 +40,7 @@ run_salmon() {
     # 1. Indexation
     if [ ! -d "${out_dir}/index" ]; then
         echo "📂 Création de l'index dans $out_dir..."
-        salmon index -t "$assembly" -i "${out_dir}/index" --keepDuplicates
+        salmon index -t "$assembly" -i "${out_dir}/index"
     fi
 
     # 2. Quantification
