@@ -73,12 +73,11 @@ if [ -f "$PR2_FILE" ]; then
     fi
 fi
 
-# B. CARTE DE REPRÉSENTATION (Mise à jour avec le fichier unifié !)
+# B. CARTE DE REPRÉSENTATION
 COMMUNITY_MAP=""
 UNIFIED_FILE="${BASE_DIR}/02_results/Analyse/${SAMPLE}/${SAMPLE}_unified_microbiome_detailed.tsv"
 
 if [ -f "$UNIFIED_FILE" ]; then
-    # J'ai laissé ton head -n 100 si tu veux une longue liste !
     COMMUNITY_MAP=$(awk -F'\t' '
         NR>1 {count[$4" - "$5]++} 
         END {for (tax in count) print count[tax]"\t"tax}
@@ -86,6 +85,7 @@ if [ -f "$UNIFIED_FILE" ]; then
 else
     COMMUNITY_MAP="| *Fichier unifié introuvable* | *Lancez le script Analyse 01* |"
 fi
+
 
 # --- 4. ANALYSE DES CONTIGS GLOBAUX & VIRUS ---
 FILE_CLUST="${BASE_DIR}/02_results/06_clustering/${SAMPLE}/mmseqs_out_rep_seq.fasta"
@@ -128,13 +128,14 @@ fi
 # --- 5. ABONDANCE GVDB ---
 FILE_ABUNDANCE="${BASE_DIR}/02_results/14_mapping_gvdb/${SAMPLE}/${SAMPLE}_viral_abundance.tsv"
 if [ -f "$FILE_ABUNDANCE" ]; then
-    # On ajoute des sauts de ligne autour du header pour Markdown
     TOP_VIRUS_MD=$(head -n 6 "$FILE_ABUNDANCE" | awk 'BEGIN {print "| Génome | Taille | Reads Mappés |\n| :--- | :---: | :---: |"} {print "| "$1" | "$2" | "$3" |"}')
 else
     TOP_VIRUS_MD="*Fichier d'abondance introuvable.*"
 fi
 
-# --- CONSTRUCTION DU MARKDOWN ---
+# ====================================================================
+# ÉTAPE A : ÉCRITURE DU FICHIER MARKDOWN (.md) EN PREMIER
+# ====================================================================
 REPORT_FILE="${DOC_DIR}/${SAMPLE}_complete_report.md"
 
 cat << EOF > "$REPORT_FILE"
@@ -160,6 +161,9 @@ cat << EOF > "$REPORT_FILE"
 | :---: | :--- |
 ${COMMUNITY_MAP}
 
+### 📊 Visualisation Interactive (Krona)
+<iframe src="./${SAMPLE}_taxonomy_krona_multi.html" width="100%" height="800px" style="border:none;"></iframe>
+
 ## 3. Analyse des Contigs et Virus
 * **Assemblage global (MMseqs2)** : ${NB_CONTIGS} contigs uniques.
 * **Candidats VirSorter2** : ${NB_VIRAUX} contigs identifiés.
@@ -179,4 +183,30 @@ ${TOP_VIRUS_MD}
 ---
 EOF
 
-echo "✅ Rapport complet généré : $REPORT_FILE"
+echo "✅ Rapport Markdown généré : $REPORT_FILE"
+
+# ====================================================================
+# ÉTAPE B : CONVERSION EN HTML (Maintenant que le .md existe)
+# ====================================================================
+HTML_REPORT="${DOC_DIR}/${SAMPLE}_complete_report.html"
+
+echo "🌐 Conversion du rapport en HTML..."
+pandoc "$REPORT_FILE" -s --metadata title="Rapport Virpav - ${SAMPLE}" -o "$HTML_REPORT"
+
+# ====================================================================
+# ÉTAPE C : CRÉATION DU PACKAGE LIVRABLE
+# ====================================================================
+echo "📦 Rapatriement du graphique Krona pour le package..."
+KRONA_SOURCE="${BASE_DIR}/02_results/Analyse/${SAMPLE}/${SAMPLE}_taxonomy_krona_multi.html"
+
+if [ -f "$KRONA_SOURCE" ]; then
+    cp "$KRONA_SOURCE" "$DOC_DIR/"
+    echo "✅ Fichier Krona copié dans $DOC_DIR"
+else
+    echo "⚠️ Impossible de trouver le Krona source pour le copier."
+fi
+
+echo "===================================================================="
+echo "🎉 C'EST PRÊT ! "
+echo "👉 Pour voir ton rapport, télécharge le dossier complet : $DOC_DIR"
+echo "===================================================================="

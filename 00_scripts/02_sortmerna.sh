@@ -12,6 +12,9 @@ SAMPLE=${1:-"MOCK_SAMPLE"}
 
 BASE_DIR="/mnt/MERSEA/morandi241/project_virpav/ANALYSIS_V3_PROPRE"
 
+source $HOME/miniconda3/etc/profile.d/conda.sh
+conda activate rnaseq
+
 # 3. LES BONS DOSSIERS (Vérifie que c'est bien là que le 01 met les fichiers)
 INPUT_DIR="$BASE_DIR/02_results/02_phix_removed/${SAMPLE}"
 OUTPUT_DIR="$BASE_DIR/02_results/03_sortmerna"

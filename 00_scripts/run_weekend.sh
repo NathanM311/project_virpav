@@ -80,6 +80,8 @@ for FILE in "${TRIMMED_DIR}"/*_R1_001_val_1.fq.gz; do
     OUT_14_1="${BASE_DIR}/02_results/14.1_mapping_gvdb_withoutf2/${SAMPLE}/${SAMPLE}_GVDB_Q10_sorted.bam"
     OUT_15="${BASE_DIR}/02_results/15_targeted_assembly/${SAMPLE}/spades_assembly/scaffolds.fasta"
     OUT_15_1="${BASE_DIR}/02_results/15.1_targeted_assembly_withoutf2/${SAMPLE}/spades_assembly/scaffolds.fasta"
+    # === NOUVELLE CIBLE 16 ===
+    OUT_16="${BASE_DIR}/02_results/16_quantification_kallisto_all/${SAMPLE}/${SAMPLE}_abundance_clustered_TPM.tsv"
 
     # --- EXÉCUTION DES SCRIPTS EN CASCADE ---
     # Le '|| continue' permet de passer à l'échantillon suivant si une étape critique échoue
@@ -101,6 +103,9 @@ for FILE in "${TRIMMED_DIR}"/*_R1_001_val_1.fq.gz; do
     run_step "14.1_mapping_gvdb_withoutf2.sh" "$SAMPLE" "14.1 - Mapping Loose" "$OUT_14_1"
     run_step "15_mapped_reads_assembly.sh" "$SAMPLE" "15 - Targeted Assembly" "$OUT_15"
     run_step "15.1_mapped_reads_assembly_withoutf2.sh" "$SAMPLE" "15.1 - Final Assembly" "$OUT_15_1"
+    
+    # === NOUVELLE ÉTAPE 16 ===
+    run_step "16_quantification_kallisto_all.sh" "$SAMPLE" "16 - Quantification Kallisto" "$OUT_16"
     
     echo "🏁 ÉCHANTILLON $SAMPLE BOUCLÉ."
 
