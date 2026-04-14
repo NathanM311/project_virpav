@@ -51,9 +51,8 @@ fi
 
 # --- 3. PORTRAIT DE L'HÔTE & CARTE DE LA COMMUNAUTÉ ---
 PR2_FILE="${BASE_DIR}/02_results/05_taxonomy/${SAMPLE}/${SAMPLE}_vs_PR2_CLEAN.tsv"
-SILVA_FILE="${BASE_DIR}/02_results/05_taxonomy/${SAMPLE}/${SAMPLE}_vs_SILVA_SSU_CLEAN.tsv"
 
-# A. HÔTE PRINCIPAL
+# A. HÔTE PRINCIPAL (Basé sur le PR2 qui garde tout)
 MAIN_HOST="*Aucun contig ribosomal Eucaryote > 800pb trouvé.*"
 if [ -f "$PR2_FILE" ]; then
     TOP_HIT=$(awk -F'\t' 'NR>1 {
@@ -73,19 +72,29 @@ if [ -f "$PR2_FILE" ]; then
     fi
 fi
 
-# B. CARTE DE REPRÉSENTATION
-COMMUNITY_MAP=""
-UNIFIED_FILE="${BASE_DIR}/02_results/Analyse/${SAMPLE}/${SAMPLE}_unified_microbiome_detailed.tsv"
+# B. CARTE DE REPRÉSENTATION (NOYAU vs ORGANITES)
+COMMUNITY_MAP_NUC=""
+COMMUNITY_MAP_ORG=""
+NUC_FILE="${BASE_DIR}/02_results/Analyse/${SAMPLE}/${SAMPLE}_unified_microbiome_nuclear.tsv"
+ORG_FILE="${BASE_DIR}/02_results/Analyse/${SAMPLE}/${SAMPLE}_unified_microbiome_organelles.tsv"
 
-if [ -f "$UNIFIED_FILE" ]; then
-    COMMUNITY_MAP=$(awk -F'\t' '
+if [ -f "$NUC_FILE" ]; then
+    COMMUNITY_MAP_NUC=$(awk -F'\t' '
         NR>1 {count[$4" - "$5]++} 
         END {for (tax in count) print count[tax]"\t"tax}
-    ' "$UNIFIED_FILE" | sort -nr | head -n 100 | awk -F'\t' '{print "| **" $1 "** | " $2 " |"}')
+    ' "$NUC_FILE" | sort -nr | head -n 50 | awk -F'\t' '{print "| **" $1 "** | " $2 " |"}')
 else
-    COMMUNITY_MAP="| *Fichier unifié introuvable* | *Lancez le script Analyse 01* |"
+    COMMUNITY_MAP_NUC="| *Fichier nucléaire introuvable* | *Lancez le script Analyse 01* |"
 fi
 
+if [ -f "$ORG_FILE" ]; then
+    COMMUNITY_MAP_ORG=$(awk -F'\t' '
+        NR>1 {count[$4" - "$5]++} 
+        END {for (tax in count) print count[tax]"\t"tax}
+    ' "$ORG_FILE" | sort -nr | head -n 50 | awk -F'\t' '{print "| **" $1 "** | " $2 " |"}')
+else
+    COMMUNITY_MAP_ORG="| *Fichier organites introuvable* | *Lancez le script Analyse 01* |"
+fi
 
 # --- 4. ANALYSE DES CONTIGS GLOBAUX & VIRUS ---
 FILE_CLUST="${BASE_DIR}/02_results/06_clustering/${SAMPLE}/mmseqs_out_rep_seq.fasta"
@@ -155,11 +164,23 @@ cat << EOF > "$REPORT_FILE"
 **A. Espèce Hôte Dominante (Top Hit 18S)**
 * ${MAIN_HOST}
 
-**B. Top de la Communauté Globale (PR2 + SILVA SSU/LSU)**
+**B. Top de la Communauté Nucléaire (Eucaryotes / Bactériome libre)**
 
 | Nombre de Contigs | Domaine - Phylum |
 | :---: | :--- |
-${COMMUNITY_MAP}
+${COMMUNITY_MAP_NUC}
+
+**C. Top des Organites (Chloroplastes & Mitochondries)**
+
+| Nombre de Contigs | Domaine - Phylum |
+| :---: | :--- |
+${COMMUNITY_MAP_ORG}
+
+[!INFO] **Note d'interprétation de l'Hôte**
+> L'identification d'un hôte principal est basée sur la présence d'un contig ribosomal eucaryote de plus de 800 pb avec une identité élevée (>97%) dans la base PR2. Si aucun contig ne répond à ces critères, cela peut indiquer un échantillon avec un hôte non identifié ou une communauté très diversifiée sans dominance claire.
+> Une attention particulière a été porté à la distinction entre le génome nucléaire et les organites. 
+> 1. **Résoulution taxonomique** : Certain transcrits 28S peuvent être mal annotés en raison des lacunes des bases de données. 
+> 2. **Fraction chloroplastique** : Le gène 23S à été isolé avec succès dans la fraction organite. 
 
 ### 📊 Visualisation Interactive (Krona)
 <iframe src="./${SAMPLE}_taxonomy_krona_multi.html" width="100%" height="800px" style="border:none;"></iframe>
