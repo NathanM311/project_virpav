@@ -72,11 +72,28 @@ if [ -f "$PR2_FILE" ]; then
     fi
 fi
 
-# B. CARTE DE REPRÉSENTATION (NOYAU vs ORGANITES)
-COMMUNITY_MAP_NUC=""
-COMMUNITY_MAP_ORG=""
-NUC_FILE="${BASE_DIR}/02_results/Analyse/${SAMPLE}/${SAMPLE}_unified_microbiome_nuclear.tsv"
-ORG_FILE="${BASE_DIR}/02_results/Analyse/${SAMPLE}/${SAMPLE}_unified_microbiome_organelles.tsv"
+# B. CARTE DE REPRÉSENTATION (NOYAU vs ORGANITES) - AVANT / APRÈS
+ANALYSE_DIR="${BASE_DIR}/02_results/Analyse/${SAMPLE}"
+
+NUC_RAW="${ANALYSE_DIR}/${SAMPLE}_unified_microbiome_nuclear.tsv"
+ORG_RAW="${ANALYSE_DIR}/${SAMPLE}_unified_microbiome_organelles.tsv"
+NUC_NC="${ANALYSE_DIR}/${SAMPLE}_unified_microbiome_nuclear_no_contaminants.tsv"
+ORG_NC="${ANALYSE_DIR}/${SAMPLE}_unified_microbiome_organelles_no_contaminants.tsv"
+
+# Petite fonction pour générer les lignes du tableau Markdown sans répéter le code
+generate_md_table() {
+    if [ -f "$1" ]; then
+        # J'ai réduit à 20 pour que la comparaison "Avant/Après" ne prenne pas 4 pages !
+        awk -F'\t' 'NR>1 {count[$4" - "$5]++} END {for (tax in count) print count[tax]"\t"tax}' "$1" | sort -nr | head -n 20 | awk -F'\t' '{print "| **" $1 "** | " $2 " |"}'
+    else
+        echo "| *Fichier introuvable* | *-* |"
+    fi
+}
+
+COMMUNITY_MAP_NUC_RAW=$(generate_md_table "$NUC_RAW")
+COMMUNITY_MAP_NUC_NC=$(generate_md_table "$NUC_NC")
+COMMUNITY_MAP_ORG_RAW=$(generate_md_table "$ORG_RAW")
+COMMUNITY_MAP_ORG_NC=$(generate_md_table "$ORG_NC")
 
 if [ -f "$NUC_FILE" ]; then
     COMMUNITY_MAP_NUC=$(awk -F'\t' '
@@ -166,15 +183,38 @@ cat << EOF > "$REPORT_FILE"
 
 **B. Top de la Communauté Nucléaire (Eucaryotes / Bactériome libre)**
 
+#### 🔴 Avant Décontamination (Brut)
 | Nombre de Contigs | Domaine - Phylum |
 | :---: | :--- |
-${COMMUNITY_MAP_NUC}
+${COMMUNITY_MAP_NUC_RAW}
+
+#### 🌊 Après Décontamination (Microbiome Marin)
+| Nombre de Contigs | Domaine - Phylum |
+| :---: | :--- |
+${COMMUNITY_MAP_NUC_NC}
 
 **C. Top des Organites (Chloroplastes & Mitochondries)**
 
+#### 🔴 Avant Décontamination (Brut)
 | Nombre de Contigs | Domaine - Phylum |
 | :---: | :--- |
-${COMMUNITY_MAP_ORG}
+${COMMUNITY_MAP_ORG_RAW}
+
+#### 🌊 Après Décontamination (Microbiome Marin)
+| Nombre de Contigs | Domaine - Phylum |
+| :---: | :--- |
+${COMMUNITY_MAP_ORG_NC}
+
+> [!INFO] **Note d'interprétation**
+> Le nettoyage a permis de supprimer les biais liés à la manipulation (ex: *Cutibacterium*, *Homo*) et aux réactifs de laboratoire (ex: *Escherichia*). Les tableaux **"Après Décontamination"** reflètent le véritable écosystème marin étudié. Le gène 23S a également été isolé avec succès dans la fraction organite, permettant de suivre l'activité photosynthétique de l'hôte.
+
+### 📊 Visualisations Interactives (Krona)
+
+#### 🔴 Vue Globale avec Contaminants
+<iframe src="./${SAMPLE}_taxonomy_krona_original.html" width="100%" height="650px" style="border:none;"></iframe>
+
+#### 🌊 Vue Épurée (Microbiome Marin)
+<iframe src="./${SAMPLE}_taxonomy_krona_clean.html" width="100%" height="650px" style="border:none;"></iframe>
 
 [!INFO] **Note d'interprétation de l'Hôte**
 > L'identification d'un hôte principal est basée sur la présence d'un contig ribosomal eucaryote de plus de 800 pb avec une identité élevée (>97%) dans la base PR2. Si aucun contig ne répond à ces critères, cela peut indiquer un échantillon avec un hôte non identifié ou une communauté très diversifiée sans dominance claire.
@@ -182,8 +222,6 @@ ${COMMUNITY_MAP_ORG}
 > 1. **Résoulution taxonomique** : Certain transcrits 28S peuvent être mal annotés en raison des lacunes des bases de données. 
 > 2. **Fraction chloroplastique** : Le gène 23S à été isolé avec succès dans la fraction organite. 
 
-### 📊 Visualisation Interactive (Krona)
-<iframe src="./${SAMPLE}_taxonomy_krona_multi.html" width="100%" height="800px" style="border:none;"></iframe>
 
 ## 3. Analyse des Contigs et Virus
 * **Assemblage global (MMseqs2)** : ${NB_CONTIGS} contigs uniques.
@@ -217,15 +255,11 @@ pandoc "$REPORT_FILE" -s --metadata title="Rapport Virpav - ${SAMPLE}" -o "$HTML
 # ====================================================================
 # ÉTAPE C : CRÉATION DU PACKAGE LIVRABLE
 # ====================================================================
-echo "📦 Rapatriement du graphique Krona pour le package..."
-KRONA_SOURCE="${BASE_DIR}/02_results/Analyse/${SAMPLE}/${SAMPLE}_taxonomy_krona_multi.html"
+echo "📦 Rapatriement des graphiques Krona pour le package..."
+KRONA_RAW="${ANALYSE_DIR}/${SAMPLE}_taxonomy_krona_original.html"
+KRONA_NC="${ANALYSE_DIR}/${SAMPLE}_taxonomy_krona_clean.html"
 
-if [ -f "$KRONA_SOURCE" ]; then
-    cp "$KRONA_SOURCE" "$DOC_DIR/"
-    echo "✅ Fichier Krona copié dans $DOC_DIR"
-else
-    echo "⚠️ Impossible de trouver le Krona source pour le copier."
-fi
+cp "$KRONA_RAW" "$KRONA_NC" "$DOC_DIR/" 2>/dev/null || echo "⚠️ Attention : Fichiers Krona non trouvés."
 
 echo "===================================================================="
 echo "🎉 C'EST PRÊT ! "

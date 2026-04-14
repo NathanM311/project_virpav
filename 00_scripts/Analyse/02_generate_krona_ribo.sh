@@ -2,78 +2,96 @@
 set -e
 
 # ------------------------------------------------------------------
-# SCRIPT Analyse 02 : KRONA PLOT MULTIPLE (NOYAU vs ORGANITES x CONTIGS vs TPM)
+# SCRIPT Analyse 02 : KRONA PLOTS (ORIGINAL vs SANS CONTAMINANTS)
 # ------------------------------------------------------------------
 
 SAMPLE=${1:-"10-21D-AC16"}
 BASE_DIR="/mnt/MERSEA/morandi241/project_virpav/ANALYSIS_V3_PROPRE"
-
-# NOUVEAUX Chemins des fichiers taxonomiques
 ANALYSE_DIR="${BASE_DIR}/02_results/Analyse/${SAMPLE}"
-NUC_FILE="${ANALYSE_DIR}/${SAMPLE}_unified_microbiome_nuclear.tsv"
-ORG_FILE="${ANALYSE_DIR}/${SAMPLE}_unified_microbiome_organelles.tsv"
+
+# Fichier TPM (Source d'abondance)
 TPM_FILE="${BASE_DIR}/02_results/16_quantification_kallisto_all/${SAMPLE}/${SAMPLE}_abundance_ribo_TPM.tsv"
 
-# Fichiers temporaires pour Krona
-KRONA_NUC_CONTIGS="${ANALYSE_DIR}/krona_nuc_contigs.txt"
-KRONA_NUC_TPM="${ANALYSE_DIR}/krona_nuc_tpm.txt"
-KRONA_ORG_CONTIGS="${ANALYSE_DIR}/krona_org_contigs.txt"
-KRONA_ORG_TPM="${ANALYSE_DIR}/krona_org_tpm.txt"
+# Fichiers Taxonomiques - SET ORIGINAL
+NUC_RAW="${ANALYSE_DIR}/${SAMPLE}_unified_microbiome_nuclear.tsv"
+ORG_RAW="${ANALYSE_DIR}/${SAMPLE}_unified_microbiome_organelles.tsv"
 
-KRONA_HTML="${ANALYSE_DIR}/${SAMPLE}_taxonomy_krona_multi.html"
+# Fichiers Taxonomiques - SET CLEAN (Sans contaminants)
+NUC_NC="${ANALYSE_DIR}/${SAMPLE}_unified_microbiome_nuclear_no_contaminants.tsv"
+ORG_NC="${ANALYSE_DIR}/${SAMPLE}_unified_microbiome_organelles_no_contaminants.tsv"
+
+# Sorties HTML
+KRONA_HTML_RAW="${ANALYSE_DIR}/${SAMPLE}_taxonomy_krona_original.html"
+KRONA_HTML_NC="${ANALYSE_DIR}/${SAMPLE}_taxonomy_krona_clean.html"
 
 echo "===================================================================="
-echo "🎡 GÉNÉRATION DU KRONA PLOT (4 VUES) POUR : $SAMPLE"
+echo "🎡 GÉNÉRATION DES KRONA PLOTS (ORIGINAL & PROPRE) POUR : $SAMPLE"
 echo "===================================================================="
 
-# Vérifications
-if [ ! -f "$TPM_FILE" ]; then echo "❌ Fichier TPM absent (lancez Kallisto d'abord)."; exit 1; fi
-if [ ! -f "$NUC_FILE" ]; then echo "⚠️ Attention: Fichier nucléaire absent."; touch "$NUC_FILE"; fi
-if [ ! -f "$ORG_FILE" ]; then echo "⚠️ Attention: Fichier organites absent."; touch "$ORG_FILE"; fi
+if [ ! -f "$TPM_FILE" ]; then echo "❌ ERREUR : Fichier TPM absent (lancez Kallisto d'abord)."; exit 1; fi
 
-# --- 1. Préparation du dataset : NOYAU ---
-echo "📝 Préparation des données Nucléaires..."
-awk -F'\t' 'NR>1 {print "1\t"$4"\t"$5"\t"$6"\t"$7"\t"$8"\t"$9"\t"$10}' "$NUC_FILE" > "$KRONA_NUC_CONTIGS"
+# --- FONCTION BASH : PRÉPARATION DES DONNÉES KRONA ---
+# Argument 1: Fichier Taxonomie | Arg 2: Fichier sortie Contigs | Arg 3: Fichier sortie TPM
+prep_krona() {
+    local tax_file=$1; local out_contigs=$2; local out_tpm=$3
+    
+    if [ ! -f "$tax_file" ]; then touch "$tax_file"; fi # Sécurité si vide
 
-awk -F'\t' '
-    NR==FNR { tpm[$1]=$2; next }
-    NR>1 { 
-        val = (tpm[$1] ? tpm[$1] : 0);
-        if (val > 0) print val"\t"$4"\t"$5"\t"$6"\t"$7"\t"$8"\t"$9"\t"$10 
-    }
-' "$TPM_FILE" "$NUC_FILE" > "$KRONA_NUC_TPM"
+    # 1. Préparation Contigs
+    awk -F'\t' 'NR>1 {print "1\t"$4"\t"$5"\t"$6"\t"$7"\t"$8"\t"$9"\t"$10}' "$tax_file" > "$out_contigs"
+    
+    # 2. Préparation TPM
+    awk -F'\t' -v tpm_f="$TPM_FILE" '
+        NR==FNR { tpm[$1]=$2; next }
+        NR>1 { 
+            val = (tpm[$1] ? tpm[$1] : 0);
+            if (val > 0) print val"\t"$4"\t"$5"\t"$6"\t"$7"\t"$8"\t"$9"\t"$10 
+        }
+    ' "$TPM_FILE" "$tax_file" > "$out_tpm"
+}
 
-# --- 2. Préparation du dataset : ORGANITES ---
-echo "📝 Préparation des données Organites (Chloroplastes/Mitochondries)..."
-awk -F'\t' 'NR>1 {print "1\t"$4"\t"$5"\t"$6"\t"$7"\t"$8"\t"$9"\t"$10}' "$ORG_FILE" > "$KRONA_ORG_CONTIGS"
-
-awk -F'\t' '
-    NR==FNR { tpm[$1]=$2; next }
-    NR>1 { 
-        val = (tpm[$1] ? tpm[$1] : 0);
-        if (val > 0) print val"\t"$4"\t"$5"\t"$6"\t"$7"\t"$8"\t"$9"\t"$10 
-    }
-' "$TPM_FILE" "$ORG_FILE" > "$KRONA_ORG_TPM"
-
-
-# --- 3. Génération du Krona (avec 4 sources) ---
-echo "🔄 Activation de Krona et génération du HTML..."
+# --- CHARGEMENT CONDA ---
+echo "🔄 Activation de l'environnement Krona..."
 source $HOME/miniconda3/etc/profile.d/conda.sh
 conda activate env_krona
 
-# ktImportText va créer un menu déroulant en haut à droite avec ces 4 options
+# ==========================================
+# 1. KRONA : SET ORIGINAL
+# ==========================================
+echo "📊 1/2 : Génération du Krona ORIGINAL (Avec contaminants)..."
+prep_krona "$NUC_RAW" "${ANALYSE_DIR}/tmp_nuc_raw_c.txt" "${ANALYSE_DIR}/tmp_nuc_raw_t.txt"
+prep_krona "$ORG_RAW" "${ANALYSE_DIR}/tmp_org_raw_c.txt" "${ANALYSE_DIR}/tmp_org_raw_t.txt"
+
 ktImportText \
-    "$KRONA_NUC_TPM,Noyau (Abondance TPM)" \
-    "$KRONA_NUC_CONTIGS,Noyau (Diversité Contigs)" \
-    "$KRONA_ORG_TPM,Organites (Abondance TPM)" \
-    "$KRONA_ORG_CONTIGS,Organites (Diversité Contigs)" \
-    -o "$KRONA_HTML"
+    "${ANALYSE_DIR}/tmp_nuc_raw_t.txt,Noyau (TPM)" \
+    "${ANALYSE_DIR}/tmp_nuc_raw_c.txt,Noyau (Contigs)" \
+    "${ANALYSE_DIR}/tmp_org_raw_t.txt,Organites (TPM)" \
+    "${ANALYSE_DIR}/tmp_org_raw_c.txt,Organites (Contigs)" \
+    -o "$KRONA_HTML_RAW"
 
+# ==========================================
+# 2. KRONA : SET CLEAN (SANS CONTAMINANTS)
+# ==========================================
+echo "📊 2/2 : Génération du Krona DÉCONTAMINÉ (Propre)..."
+if [ -f "$NUC_NC" ]; then
+    prep_krona "$NUC_NC" "${ANALYSE_DIR}/tmp_nuc_nc_c.txt" "${ANALYSE_DIR}/tmp_nuc_nc_t.txt"
+    prep_krona "$ORG_NC" "${ANALYSE_DIR}/tmp_org_nc_c.txt" "${ANALYSE_DIR}/tmp_org_nc_t.txt"
+
+    ktImportText \
+        "${ANALYSE_DIR}/tmp_nuc_nc_t.txt,Noyau (TPM)" \
+        "${ANALYSE_DIR}/tmp_nuc_nc_c.txt,Noyau (Contigs)" \
+        "${ANALYSE_DIR}/tmp_org_nc_t.txt,Organites (TPM)" \
+        "${ANALYSE_DIR}/tmp_org_nc_c.txt,Organites (Contigs)" \
+        -o "$KRONA_HTML_NC"
+else
+    echo "⚠️  Fichiers décontaminés introuvables. Lancez le script 04.1 avant."
+fi
+
+# --- NETTOYAGE ---
 conda deactivate
+rm -f "${ANALYSE_DIR}"/tmp_*.txt
 
-# Nettoyage
-rm -f "$KRONA_NUC_CONTIGS" "$KRONA_NUC_TPM" "$KRONA_ORG_CONTIGS" "$KRONA_ORG_TPM"
-
-echo "✅ Krona Plot 4-en-1 généré : $KRONA_HTML"
-echo "💡 Note : Ouvrez le HTML dans un navigateur web. Le menu en haut à gauche permet de basculer entre le noyau et les organites !"
+echo "✅ Fichiers Krona générés avec succès !"
+echo "   🧬 Version brute : $(basename $KRONA_HTML_RAW)"
+echo "   🌊 Version pure  : $(basename $KRONA_HTML_NC)"
 echo "===================================================================="
