@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 # ------------------------------------------------------------------
-# SCRIPT 16 (V3 - LONG) : RAPPORT D'ANALYSE COMPLET (OBSIDIAN READY)
+# SCRIPT A1 (V3 - LONG) : RAPPORT D'ANALYSE COMPLET (OBSIDIAN READY)
 # ------------------------------------------------------------------
 
 SAMPLE=${1:-"MOCK_SAMPLE"}
